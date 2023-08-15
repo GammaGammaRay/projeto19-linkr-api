@@ -5,10 +5,9 @@ export const signin = Joi.object({
     password: Joi.string().trim().required()
 }).required();
 
-export const sigup = Joi.object({
-    name: Joi.string().required(),
+export const signup = Joi.object({
+    username: Joi.string().required(),
+    profileUrl: Joi.string().uri().required(),
     email: Joi.string().email().required(),
     password: Joi.string().required(),
-    cpf: Joi.string().length(11).pattern(/^\d+$/).required(),
-    phoneNumber: Joi.string().length(11).pattern(/^\d+$/).required(),
 }).required();
