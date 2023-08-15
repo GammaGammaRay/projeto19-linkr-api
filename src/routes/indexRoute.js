@@ -1,5 +1,8 @@
 import { Router } from "express";
-//import usersRoutes from "./usersRoutes.js";
+import AuthRouter from "./auth.routes.js";
 
-export const indexRoute = Router();
-//indexRoute.use(usersRoutes);
+const indexRoute = Router();
+
+indexRoute.use(AuthRouter);
+
+export { indexRoute }
