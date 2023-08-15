@@ -21,5 +21,14 @@
     "joi": "^17.9.2",
     "pg": "^8.11.0",
     "uuid": "^9.0.0"
-  }
+  },
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GammaGammaRay/projeto19-linkr-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/GammaGammaRay/projeto19-linkr-api/issues"
+  },
+  "homepage": "https://github.com/GammaGammaRay/projeto19-linkr-api#readme"
 }
