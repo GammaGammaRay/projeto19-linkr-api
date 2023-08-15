@@ -1,0 +1,41 @@
+NESSSA TELA PODEMOS DEIXAR SEMPRE A ESTRUTURA DA CRIAÇÃO DO BANCO DE
+DADOS ATUALIZADA 
+
+
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  "profileUrl" INTEGER,
+  "userName" VARCHAR UNIQUE NOT NULL,
+  email VARCHAR UNIQUE NOT NULL,
+  hash VARCHAR NOT NULL,
+  "createdAt" TIMESTAMP NOT NULL
+);
+
+CREATE TABLE sessions (
+  "userId" INTEGER REFERENCES users(id),
+  token VARCHAR,
+  "createdAt" TIMESTAMP NOT NULL
+);
+
+CREATE TABLE posts (
+  id SERIAL PRIMARY KEY,
+  author INTEGER REFERENCES users(id),
+  link VARCHAR NOT NULL,
+  description TEXT NOT NULL,
+  "createdAt" TIMESTAMP NOT NULL
+);
+
+CREATE TABLE curtidas (
+  author INTEGER REFERENCES users(id),
+  "postId" INTEGER REFERENCES posts(id)
+);
+
+CREATE TABLE tags (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR UNIQUE NOT NULL
+);
+
+CREATE TABLE posts_tags (
+  "postId" INTEGER REFERENCES posts(id),
+  "tagId" INTEGER REFERENCES tags(id)
+);
