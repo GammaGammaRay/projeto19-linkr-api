@@ -1,6 +1,6 @@
 import { db } from "../database/databaseConnection.js"
 
-export const handleLIke = async()=>{
+export const handleLIke = async(req, res)=>{
     const {userId} = res.locals.userId;
     const {postId} = req.params;
     try {
