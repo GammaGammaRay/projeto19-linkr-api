@@ -27,3 +27,19 @@ export const handleLIke = async(req, res)=>{
         res.status(500).send(error.message);
     }
 }
+
+export const deletePost = async(req, res)=>{
+    const {postId} = req.body;
+    try {
+        const result = await db.query(`
+        
+            DELETE FROM posts WHERE id = $1; 
+
+        `, [postId]);
+        if(result.rowCount===0)return res.status(500).send('operação não realizada');
+        return res.send(204);
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send(error.message);
+    }
+}
