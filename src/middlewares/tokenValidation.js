@@ -1,19 +1,23 @@
-import { db } from "../database/databaseConnection.js";
+import { ReadSession } from "../repositories/auth.repository.js";
 
 export async function tokenValidation (req, res, next ){
-    const {authorization} = req.headers;
 
+    const { authorization } = req.headers;
     const token = authorization?.replace("Bearer ", "");
-    if(!token)return res.status(401).send( 'Usuário não logado!');
 
-    try{
-        const response = await db.query(`
-            SELECT * FROM sessions WHERE token = $1
-        `, [token]);
-        if(response.rowCount === 0)return res.status(401).send('Usuário não permitido!');
-        res.locals.userId = response.rows[0].userId;
+    try {
+
+        if (!token) return res.status(401).send('Token inválido!');
+
+        const session = await ReadSession(token);
+
+        if(!session) return res.status(401).send('Token inválido!');
+
+        res.locals.userId = session.userId;
         next();
-    }catch(error){
+
+    } catch (error) {
         res.status(500).send(error.message);
     }
+
 }
