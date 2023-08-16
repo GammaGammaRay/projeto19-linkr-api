@@ -4,12 +4,12 @@ export const handleLIke = async(req, res)=>{
     const {userId} = res.locals.userId;
     const {postId} = req.body;
     try {
-        const isLiked = db.query(`
+        const isLiked = await db.query(`
             SELECT * FROM curtidas
             WHERE author = $1 AND "postId" =$2;
         `,[userId, postId]);
-
-        if(isLiked.rowCount===0){
+    
+        if(isLiked.rowCount === 0){
             await db.query(`
                 INSERT INTO curtidas (author, "postId")
                 VALUES ($1, $2);
@@ -20,8 +20,7 @@ export const handleLIke = async(req, res)=>{
                 DELETE FROM curtidas WHERE id = $1;
             `,[isLiked.rows[0].id]);
             return res.send(204);
-        }      
-
+        } 
         
     } catch (error) {
         console.log(error.message);

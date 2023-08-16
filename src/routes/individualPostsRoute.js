@@ -4,6 +4,6 @@ import { tokenValidation } from "../middlewares/tokenValidation.js";
 
 const individualPostsRoute = Router();
 
-individualPostsRoute.use('/handleLike', tokenValidation ,handleLIke);
+individualPostsRoute.post('/handleLike',tokenValidation ,handleLIke);
 
 export default individualPostsRoute;
