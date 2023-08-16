@@ -1,41 +1,46 @@
-NESSSA TELA PODEMOS DEIXAR SEMPRE A ESTRUTURA DA CRIAÇÃO DO BANCO DE
-DADOS ATUALIZADA 
-
-
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
-  "profileUrl" INTEGER,
-  "userName" VARCHAR UNIQUE NOT NULL,
-  email VARCHAR UNIQUE NOT NULL,
-  hash VARCHAR NOT NULL,
+  "profileUrl" VARCHAR(255),
+  "userName" VARCHAR(255) UNIQUE NOT NULL,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  hash VARCHAR(255) NOT NULL,
   "createdAt" TIMESTAMP NOT NULL
 );
 
 CREATE TABLE sessions (
-  "userId" INTEGER REFERENCES users(id),
-  token VARCHAR,
-  "createdAt" TIMESTAMP NOT NULL
+  id  SERIAL PRIMARY KEY,
+  "userId" INT UNIQUE NOT NULL,
+  token VARCHAR(255),
+  "createdAt" TIMESTAMP NOT NULL,
+  FOREIGN KEY ("userId") REFERENCES users(id)
 );
 
 CREATE TABLE posts (
   id SERIAL PRIMARY KEY,
-  author INTEGER REFERENCES users(id),
-  link VARCHAR NOT NULL,
+  author INT NOT NULL,
+  link VARCHAR(255) NOT NULL,
   description TEXT NOT NULL,
-  "createdAt" TIMESTAMP NOT NULL
+  "createdAt" TIMESTAMP NOT NULL,
+  FOREIGN KEY (author) REFERENCES users(id)
 );
 
 CREATE TABLE curtidas (
-  author INTEGER REFERENCES users(id),
-  "postId" INTEGER REFERENCES posts(id)
+  id SERIAL PRIMARY KEY,
+  author INT NOT NULL,
+  "postId" INT NOT NULL,
+  FOREIGN KEY (author) REFERENCES users(id),
+  FOREIGN KEY ("postId") REFERENCES posts(id)
 );
 
 CREATE TABLE tags (
   id SERIAL PRIMARY KEY,
-  name VARCHAR UNIQUE NOT NULL
+  name VARCHAR(255) UNIQUE NOT NULL
 );
 
 CREATE TABLE posts_tags (
-  "postId" INTEGER REFERENCES posts(id),
-  "tagId" INTEGER REFERENCES tags(id)
+  id SERIAL PRIMARY KEY,
+  "postId" INT NOT NULL,
+  "tagId" INT NOT NULL,
+  FOREIGN KEY ("postId") REFERENCES posts(id),
+  FOREIGN KEY ("tagId") REFERENCES tags(id)
 );
