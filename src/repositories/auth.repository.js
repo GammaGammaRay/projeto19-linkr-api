@@ -1,7 +1,7 @@
 import { db } from "../database/databaseConnection.js";
 
 export async function CreateUser(username, profileUrl, email, hash) {
-    const result = await db.query(`INSERT INTO users(username, "profileUrl", email, hash) VALUES ($1, $2, $3, $4) RETURNING id`, [username, profileUrl, email, hash]);
+    const result = await db.query(`INSERT INTO users("userName", "profileUrl", email, hash) VALUES ($1, $2, $3, $4) RETURNING id`, [username, profileUrl, email, hash]);
 
     return result.rows[0].id;
 };
