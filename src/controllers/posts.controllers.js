@@ -3,9 +3,9 @@ import {postsDB, getPostsDB, recentPosts, amountPosts} from "../repositories/pos
 
 export async function createPosts(req, res) {
     try {
-      const { url, description} = req.body;
+      const { link, description} = req.body;
     
-      await postsDB(url, description);
+      await postsDB(link, description);
       res.sendStatus(201);
     } catch (error) {
       res.status(500).send(error.message);
