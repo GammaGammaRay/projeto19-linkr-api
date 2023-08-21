@@ -56,6 +56,9 @@ export async function getPosts(req, res) {
           tagId: post.tagId,
           userName: post.userName,
           description: post.description,
+          urlDescr: post.urlDescr,
+          urlImg: post.urlImg,
+          urlTitle: post.urlTitle,
         })),      
       });
 
