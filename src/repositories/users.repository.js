@@ -1,4 +1,3 @@
-import { query } from "express";
 import { db as connection } from "../database/databaseConnection.js";
 
 export async function searchUsersRepository(string) {

@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { searchUsers } from "../controllers/usersControllers.js";
+import { tokenValidation } from "../middlewares/tokenValidation.js";
 
 const usersRoute = Router();
 
