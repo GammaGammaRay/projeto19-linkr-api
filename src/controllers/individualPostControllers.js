@@ -36,6 +36,23 @@ export const deletePost = async(req, res)=>{
             DELETE FROM posts WHERE id = $1; 
 
         `, [postId]);
+        if(result.rowCount===0)return res.status(404).send('operação não realizada');
+        return res.send(204);
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send(error.message);
+    }
+}
+
+export const editPost = async(req, res)=>{
+    const {postId, description} = req.body;
+    try {
+        const result = await db.query(`
+            UPDATE posts 
+            SET description=$1
+            WHERE id = $2;
+
+        `, [ description, postId]);
         if(result.rowCount===0)return res.status(500).send('operação não realizada');
         return res.send(204);
     } catch (error) {
