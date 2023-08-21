@@ -18,6 +18,7 @@ export default async function signup(req, res) {
         return res.sendStatus(201);
         
     } catch (error) {
+        console.log(error.message)
         return res.status(500).send(error); 
     }
 

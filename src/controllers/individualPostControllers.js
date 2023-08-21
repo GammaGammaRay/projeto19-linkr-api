@@ -45,14 +45,14 @@ export const deletePost = async(req, res)=>{
 }
 
 export const editPost = async(req, res)=>{
-    const {postId, link, description} = req.body;
+    const {postId, description} = req.body;
     try {
         const result = await db.query(`
             UPDATE posts 
-            SET link = $1, description=$2
-            WHERE id = $3;
+            SET description=$1
+            WHERE id = $2;
 
-        `, [link, description, postId]);
+        `, [ description, postId]);
         if(result.rowCount===0)return res.status(500).send('operação não realizada');
         return res.send(204);
     } catch (error) {
