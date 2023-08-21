@@ -1,18 +1,29 @@
 import { db } from "../database/databaseConnection.js"
+import { insertPostTag, insertTagDB } from "./hashtags.repository.js";
 
 
 export async function postsDB(link, description, userId, hashtags) {
-    const result = await db.query(
+  try {
+    await db.query("BEGIN");
+
+    const postResult = await db.query(
       `INSERT INTO posts (link, description, author) VALUES ($1, $2, $3) RETURNING *`,
       [link, description, userId]
     );
 
+    const postId = postResult.rows[0].id;
+
     for (const hashtag of hashtags) {
-      await insertTagDB(hashtag);
+      const tagId = await insertTagDB(hashtag);
+      await insertPostTag(postId, tagId);
     }
-  
-    return result.rows[0];
-};
+
+    await db.query("COMMIT");
+  } catch (error) {
+    await db.query("ROLLBACK");
+    throw error;
+  }
+}
 
 
 export const amountPosts = async () => {

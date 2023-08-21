@@ -36,28 +36,25 @@ export async function getTrendingTagsDB() {
 }
 
 export async function insertTagDB(tagName) {
-    const tagQueryResult = await db.query(
-      `SELECT * FROM tags WHERE name = $1`,
-      [tagName]
-    );
-  
-    if (tagQueryResult.rowCount > 0) {
-      return tagQueryResult.rows[0];
-    }
-  
-    const query = `
-      INSERT INTO tags (name)
-      VALUES ($1)
-      RETURNING *;
-    `;
-  
-    const values = [tagName];
-  
-    try {
-      const result = await db.query(query, values);
-      return result.rows[0];
-    } catch (error) {
-      console.error("Error inserting new tag:", error.message);
-      throw error;
-    }
+  const result = await db.query(
+    `INSERT INTO tags (name) VALUES ($1) ON CONFLICT (name) DO NOTHING RETURNING id`,
+    [tagName]
+  );
+
+  if (result.rows.length > 0) {
+    return result.rows[0].id;
   }
+
+  const existingTag = await db.query(`SELECT id FROM tags WHERE name = $1`, [
+    tagName,
+  ]);
+
+  return existingTag.rows[0].id;
+}
+
+export async function insertPostTag(postId, tagId) {
+  await db.query(`INSERT INTO posts_tags ("postId", "tagId") VALUES ($1, $2)`, [
+    postId,
+    tagId,
+  ]);
+}
