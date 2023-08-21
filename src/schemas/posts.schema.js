@@ -1,7 +1,8 @@
 import Joi from "joi";
 
 export const postSchema = Joi.object({
-  link: Joi.string().uri().required(),
+  author: Joi.number().required(),
+  link: Joi.string().required(),
   description: Joi.string().allow("").optional(),
 });
 

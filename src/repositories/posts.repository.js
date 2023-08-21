@@ -1,11 +1,10 @@
 import { db } from "../database/databaseConnection.js"
 
 
-export async function postsDB(link, description, hashtags) {
-    
+export async function postsDB(link, description, userId, hashtags) {
     const result = await db.query(
-      `INSERT INTO posts (link, description) VALUES ($1, $2) RETURNING *`,
-      [link, description]
+      `INSERT INTO posts (link, description, author) VALUES ($1, $2, $3) RETURNING *`,
+      [link, description, userId]
     );
 
     for (const hashtag of hashtags) {
@@ -31,7 +30,6 @@ export async function getPostsDB(limit, offset) {
         'id', posts."id",
         'description', posts.description, 
         'link', posts.link,
-        'tagId', posts_tags."tagId",
         'author', posts."author" 
       ) AS post
       FROM users
@@ -66,6 +64,48 @@ export async function getPostsDB(limit, offset) {
       return p.post;
     });
   };
+// export async function getPostsDB(limit, offset) {
+//     const newObject = `
+//       SELECT JSONB_BUILD_OBJECT(
+//         'userName', users."userName",
+//         'id', posts."id",
+//         'description', posts.description, 
+//         'link', posts.link,
+//         'tagId', posts_tags."tagId",
+//         'author', posts."author" 
+//       ) AS post
+//       FROM users
+//       INNER JOIN posts ON posts.author = users.id
+//       LIMIT ${limit}
+//       OFFSET ${offset}
+//     `;
+  
+//     const result = await db.query(newObject);
+//     const list = result.rows;
+  
+//     const metadata = list.map(async (e) => {
+//       try {
+//         const link = e.post.url
+//         await axios
+//           .get(`https://jsonlink.io/api/extract?url=${link}`)
+//           .then(res => {
+  
+//             const { title, description } = res.data
+//             e.post.urlTitle = title || ''
+//             e.post.urlDescr = description || ''
+//           })
+//       } catch (err) {
+//         return;
+//       }
+//       return e.post;
+//     });
+  
+//     await Promise.all(metadata);
+  
+//     return list.map((p) => {
+//       return p.post;
+//     });
+//   };
 
 
   export function recentPosts(createdAt) {

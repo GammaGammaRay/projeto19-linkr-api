@@ -4,11 +4,11 @@ import { extractHashtags } from "./hashtagsControllers.js";
 
 export async function createPosts(req, res) {
     try {
-      const { link, description} = req.body;
+      const { link, description, author} = req.body;
     
       let hashtags = extractHashtags(description)
       
-      await postsDB(link, description, hashtags);
+      await postsDB(link, description, author, hashtags);
       res.sendStatus(201);
     } catch (error) {
       res.status(500).send(error.message);
