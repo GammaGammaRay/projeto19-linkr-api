@@ -10,6 +10,8 @@ export async function getUserPostsRepository(id) {
   const newObject = `
       SELECT JSONB_BUILD_OBJECT(
         'userName', users."userName",
+        'userId', users.id,
+        'profileUrl', users."profileUrl",
         'id', posts."id",
         'description', posts.description, 
         'link', posts.link,

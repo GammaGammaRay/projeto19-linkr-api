@@ -1,4 +1,4 @@
-import { db } from "../database/database.connection.js"
+import { db } from "../database/databaseConnection.js"
 
 
 export async function postsDB(link, description) {
@@ -24,10 +24,11 @@ export async function getPostsDB(limit, offset) {
     const newObject = `
       SELECT JSONB_BUILD_OBJECT(
         'userName', users."userName",
+        'userId', users.id,
+        'profileUrl', users."profileUrl",
         'id', posts."id",
         'description', posts.description, 
         'link', posts.link,
-        'tagId', posts_tags."tagId",
         'author', posts."author" 
       ) AS post
       FROM users
