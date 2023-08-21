@@ -1,4 +1,4 @@
-import { getPostsByTagDB, getTrendingTagsDB } from "../repositories/hashtags.repository";
+import { getPostsByTagDB, getTrendingTagsDB, insertTagDB } from "../repositories/hashtags.repository.js";
 
 
 export async function getTrendingTags(req, res) {
@@ -33,10 +33,15 @@ export async function getTrendingTags(req, res) {
     const { tagName } = req.params;
   
     try {
-      const users = await getPostsByTagDB(tagName)
-      res.status(200).send(users);
+      const tag = await insertTagDB(tagName)
+      res.status(200).send(tag);
     } catch (err) {
       console.log(err);
       res.status(500).send(err.message);
     }
+  }
+
+  export function extractHashtags(description) {
+    const hashtags = description.match(/#\w+/g);
+    return hashtags || [];
   }

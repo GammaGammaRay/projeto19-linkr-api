@@ -1,12 +1,16 @@
-import { db } from "../database/database.connection.js"
+import { db } from "../database/databaseConnection.js"
 
 
-export async function postsDB(link, description) {
+export async function postsDB(link, description, hashtags) {
     
     const result = await db.query(
       `INSERT INTO posts (link, description) VALUES ($1, $2) RETURNING *`,
       [link, description]
     );
+
+    for (const hashtag of hashtags) {
+      await insertTagDB(hashtag);
+    }
   
     return result.rows[0];
 };
