@@ -23,17 +23,17 @@ export async function getPostsByTagDB(tagName) {
 
 export async function getTrendingTagsDB() {
   const result = await db.query(
-    `SELECT tags.name, COUNT(posts_tags."tagId") AS usage_count
+    `SELECT tags.name
     FROM tags
     JOIN posts_tags ON tags.id = posts_tags."tagId"
     GROUP BY tags.name
-    ORDER BY usage_count DESC
+    ORDER BY COUNT(posts_tags."tagId") DESC
     LIMIT 10;`
   );
 
-  if (result.rowCount === 0) return null;
-  return result.rows[0];
+  return result.rows.map((row) => row.name);
 }
+
 
 export async function insertTagDB(tagName) {
   const result = await db.query(
