@@ -46,9 +46,10 @@ export async function getPostsDB(limit, offset) {
           .get(`https://jsonlink.io/api/extract?url=${link}`)
           .then(res => {
   
-            const { title, description } = res.data
+            const { title, description, images } = res.data
             e.post.urlTitle = title || ''
             e.post.urlDescr = description || ''
+            e.post.urlImg = images[0] || ''
           })
       } catch (err) {
         return;
