@@ -1,11 +1,14 @@
 import {postsDB, getPostsDB, recentPosts, amountPosts} from "../repositories/posts.repository.js";
+import { extractHashtags } from "./hashtagsControllers.js";
 
 
 export async function createPosts(req, res) {
     try {
-      const { link, description} = req.body;
+      const { link, description, author} = req.body;
     
-      await postsDB(link, description);
+      let hashtags = extractHashtags(description)
+      
+      await postsDB(link, description, author, hashtags);
       res.sendStatus(201);
     } catch (error) {
       res.status(500).send(error.message);
@@ -55,6 +58,9 @@ export async function getPosts(req, res) {
           tagId: post.tagId,
           userName: post.userName,
           description: post.description,
+          urlDescr: post.urlDescr,
+          urlImg: post.urlImg,
+          urlTitle: post.urlTitle,
         })),      
       });
 

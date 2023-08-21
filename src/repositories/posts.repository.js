@@ -1,15 +1,29 @@
 import { db } from "../database/databaseConnection.js"
+import { insertPostTag, insertTagDB } from "./hashtags.repository.js";
 
 
-export async function postsDB(link, description) {
-    
-    const result = await db.query(
-      `INSERT INTO posts (link, description) VALUES ($1, $2) RETURNING *`,
-      [link, description]
+export async function postsDB(link, description, userId, hashtags) {
+  try {
+    await db.query("BEGIN");
+
+    const postResult = await db.query(
+      `INSERT INTO posts (link, description, author) VALUES ($1, $2, $3) RETURNING *`,
+      [link, description, userId]
     );
-  
-    return result.rows[0];
-};
+
+    const postId = postResult.rows[0].id;
+
+    for (const hashtag of hashtags) {
+      const tagId = await insertTagDB(hashtag);
+      await insertPostTag(postId, tagId);
+    }
+
+    await db.query("COMMIT");
+  } catch (error) {
+    await db.query("ROLLBACK");
+    throw error;
+  }
+}
 
 
 export const amountPosts = async () => {
@@ -33,6 +47,7 @@ export async function getPostsDB(limit, offset) {
       ) AS post
       FROM users
       INNER JOIN posts ON posts.author = users.id
+      ORDER BY posts."createdAt" DESC
       LIMIT ${limit}
       OFFSET ${offset}
     `;
@@ -47,9 +62,10 @@ export async function getPostsDB(limit, offset) {
           .get(`https://jsonlink.io/api/extract?url=${link}`)
           .then(res => {
   
-            const { title, description } = res.data
+            const { title, description, images } = res.data
             e.post.urlTitle = title || ''
             e.post.urlDescr = description || ''
+            e.post.urlImg = images[0] || ''
           })
       } catch (err) {
         return;
@@ -63,7 +79,6 @@ export async function getPostsDB(limit, offset) {
       return p.post;
     });
   };
-
 
   export function recentPosts(createdAt) {
     return db.query(
