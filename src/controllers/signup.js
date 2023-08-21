@@ -8,7 +8,7 @@ export default async function signup(req, res) {
     try {
 
         const user = await ReadUserByEmail(email);
-        if(user) return res.send(409).send("Email já registrado!");
+        if(user) return res.status(409).send("Email já registrado!");
         
         const hash = hashSync(password, 10);
 
