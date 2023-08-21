@@ -51,6 +51,8 @@ export async function getPosts(req, res) {
   
         results: posts.map((post) => ({
           id: post.id,
+          userId: post.userId,
+          profileUrl: post.profileUrl,
           link: post.link,
           author: post.author,
           tagId: post.tagId,

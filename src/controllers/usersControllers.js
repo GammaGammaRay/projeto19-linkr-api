@@ -1,4 +1,7 @@
-import { getUserPostsRepository, searchUsersRepository } from "../repositories/users.repository.js";
+import {
+  getUserPostsRepository,
+  searchUsersRepository,
+} from "../repositories/users.repository.js";
 
 export async function searchUsers(req, res) {
   const { string } = req.params;
@@ -21,12 +24,13 @@ export async function getUserPosts(req, res) {
     res.status(200).send({
       results: posts.map((post) => ({
         id: post.id,
+        userId: post.userId,
+        profileUrl: post.profileUrl,
         link: post.link,
         author: post.author,
         tagId: post.tagId,
         userName: post.userName,
         description: post.description,
-        profileUrl: post.profileUrl,
       })),
     });
   } catch (err) {
