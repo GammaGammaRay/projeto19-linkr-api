@@ -13,7 +13,6 @@ export async function getUserPostsRepository(id) {
         'id', posts."id",
         'description', posts.description, 
         'link', posts.link,
-        'tagId', posts_tags."tagId",
         'author', posts."author" 
       ) AS post
       FROM users
