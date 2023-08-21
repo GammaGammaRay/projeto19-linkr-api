@@ -13,6 +13,7 @@ export async function getTrendingTags(req, res) {
   }
 
   export async function getPostsByTag(req, res) {
+    console.log(req)
     const { tagName } = req.params;
   
     try {
