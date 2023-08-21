@@ -36,7 +36,7 @@ export const deletePost = async(req, res)=>{
             DELETE FROM posts WHERE id = $1; 
 
         `, [postId]);
-        if(result.rowCount===0)return res.status(500).send('operação não realizada');
+        if(result.rowCount===0)return res.status(404).send('operação não realizada');
         return res.send(204);
     } catch (error) {
         console.log(error.message);
