@@ -18,14 +18,14 @@ export async function returnUserId(req) {
   
   export function editPostDB(id, link, description, userId) {
     return db.query(
-      `UPDATE posts SET link = $1, description = $2 WHERE id = $3 AND "userId" = $4`,
+      `UPDATE posts SET link = $1, description = $2 WHERE id = $3 AND "author" = $4`,
       [link, description, id, userId]
     );
   };
 
 
   export function deletePostsDB(id, userId) {
-    return db.query(`DELETE FROM posts WHERE id = $1 AND "userId" = $2`, [
+    return db.query(`DELETE FROM posts WHERE id = $1 AND "author" = $2`, [
       id,
       userId,
     ]);
