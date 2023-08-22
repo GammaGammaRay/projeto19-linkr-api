@@ -1,7 +1,7 @@
 import { db } from "../database/databaseConnection.js"
 
 export const handleLIke = async(req, res)=>{
-    const {userId} = res.locals.userId;
+    const {userId} = res.locals;
     const {postId} = req.body;
     try {
         const isLiked = await db.query(`
