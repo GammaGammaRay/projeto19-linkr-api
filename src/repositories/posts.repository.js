@@ -35,49 +35,52 @@ export const amountPosts = async () => {
 
 
 export async function getPostsDB(limit, offset) {
-    const newObject = `
-      SELECT JSONB_BUILD_OBJECT(
-        'userName', users."userName",
-        'userId', users.id,
-        'profileUrl', users."profileUrl",
-        'id', posts."id",
-        'description', posts.description, 
-        'link', posts.link,
-        'author', posts."author" 
-      ) AS post
-      FROM users
-      INNER JOIN posts ON posts.author = users.id
-      ORDER BY posts."createdAt" DESC
-      LIMIT ${limit}
-      OFFSET ${offset}
-    `;
-  
-    const result = await db.query(newObject);
-    const list = result.rows;
-  
-    const metadata = list.map(async (e) => {
+
+    const { userId } = res.locals; 
+
+    const result = await db.query(`
+      SELECT 
+        posts.id, 
+        description, 
+        link, 
+        author, 
+        "userName", 
+        "profileUrl", 
+        (SELECT COUNT(*) FROM curtidas WHERE curtidas."postId" = posts.id) AS "LikeCount",
+        EXISTS(SELECT author, "postId" FROM curtidas WHERE posts.id = "postId" AND author = $3) AS "liked",
+        metadata {title, description, images}
+      FROM 
+          posts
+      INNER JOIN 
+          users 
+      ON 
+          posts.author = users.id
+      LIMIT $1
+      OFFSET $2`, [limit, offset, userId]
+    );
+
+    if(result.rowCount === 0) return null;
+
+    const posts = result.rows;
+    const metadata = posts.map(async (post, index) => {
       try {
-        const link = e.post.url
-        await axios
-          .get(`https://jsonlink.io/api/extract?url=${link}`)
-          .then(res => {
-  
-            const { title, description, images } = res.data
-            e.post.urlTitle = title || ''
-            e.post.urlDescr = description || ''
-            e.post.urlImg = images[0] || ''
-          })
+        const response = await axios.get(`https://jsonlink.io/api/extract?url=${post.link}`)
+        const { title, description, images } = response.data;
+        const metadata = {title, description, images};
+
+        posts[index].metadata = metadata;
+        return metadata;
+
       } catch (err) {
+        console.log("Error while fetching metadata: ");
+        console.log(err);
         return;
       }
-      return e.post;
     });
   
     await Promise.all(metadata);
   
-    return list.map((p) => {
-      return p.post;
-    });
+    return posts;
   };
 
   export function recentPosts(createdAt) {

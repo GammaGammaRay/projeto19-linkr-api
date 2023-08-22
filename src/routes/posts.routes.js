@@ -7,9 +7,9 @@ import { tokenValidation } from '../middlewares/tokenValidation.js';
 
 const postsRouter = Router();
 
-postsRouter.post('/posts', schemaValidation(postSchema), createPosts);
-postsRouter.get('/posts', getPosts);
-postsRouter.post('/handleLike',tokenValidation ,handleLIke);
+postsRouter.post('/posts', schemaValidation(postSchema), tokenValidation, createPosts);
+postsRouter.get('/posts', tokenValidation, getPosts);
+postsRouter.post('/handleLike', tokenValidation ,handleLIke);
 postsRouter.delete('/deletePost',tokenValidation ,deletePost);
 
 export default postsRouter;
