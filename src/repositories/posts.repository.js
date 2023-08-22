@@ -1,6 +1,6 @@
 import { db } from "../database/databaseConnection.js"
 import { insertPostTag, insertTagDB } from "./hashtags.repository.js";
-
+import axios from "axios";
 
 export async function postsDB(link, description, userId, hashtags) {
   try {
@@ -34,9 +34,7 @@ export const amountPosts = async () => {
 };
 
 
-export async function getPostsDB(limit, offset) {
-
-    const { userId } = res.locals; 
+export async function getPostsDB(limit, offset, userId) {
 
     const result = await db.query(`
       SELECT 
@@ -47,8 +45,7 @@ export async function getPostsDB(limit, offset) {
         "userName", 
         "profileUrl", 
         (SELECT COUNT(*) FROM curtidas WHERE curtidas."postId" = posts.id) AS "LikeCount",
-        EXISTS(SELECT author, "postId" FROM curtidas WHERE posts.id = "postId" AND author = $3) AS "liked",
-        metadata {title, description, images}
+        EXISTS(SELECT author, "postId" FROM curtidas WHERE posts.id = "postId" AND author = $3) AS "liked"
       FROM 
           posts
       INNER JOIN 
@@ -62,23 +59,22 @@ export async function getPostsDB(limit, offset) {
     if(result.rowCount === 0) return null;
 
     const posts = result.rows;
-    const metadata = posts.map(async (post, index) => {
+  
+    for (let i = 0; i < posts.length; i++) {
+      const post = posts[i];
+      
       try {
         const response = await axios.get(`https://jsonlink.io/api/extract?url=${post.link}`)
         const { title, description, images } = response.data;
         const metadata = {title, description, images};
 
-        posts[index].metadata = metadata;
-        return metadata;
+        posts[i].metadata = metadata;
 
       } catch (err) {
         console.log("Error while fetching metadata: ");
         console.log(err);
-        return;
       }
-    });
-  
-    await Promise.all(metadata);
+    }
   
     return posts;
   };
