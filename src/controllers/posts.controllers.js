@@ -18,6 +18,8 @@ export async function createPosts(req, res) {
 
 export async function getPosts(req, res) {
     try {
+      console.log(res.locals);
+      const { userId } = res.locals; 
       let { limit, offset } = req.query;
   
       if (!limit) limit = 5;
@@ -25,7 +27,6 @@ export async function getPosts(req, res) {
   
       const { rows } = await recentPosts(); 
       const numberPosts = await amountPosts();
-      console.log(rows)
       
       const totalPosts = rows[0].amountPosts;
       const newUrl = req.route.path;
@@ -40,29 +41,9 @@ export async function getPosts(req, res) {
           ? `${newUrl}?limit=${limit}&offset=${previous}`
           : null;
   
-      const posts = await getPostsDB(limit, offset);
+      const posts = await getPostsDB(limit, offset, userId);
   
-      res.status(200).send({
-        previousUrl,
-        nextUrl,
-        limit,
-        offset,
-        totalPosts,
-  
-        results: posts.map((post) => ({
-          id: post.id,
-          userId: post.userId,
-          profileUrl: post.profileUrl,
-          link: post.link,
-          author: post.author,
-          tagId: post.tagId,
-          userName: post.userName,
-          description: post.description,
-          urlDescr: post.urlDescr,
-          urlImg: post.urlImg,
-          urlTitle: post.urlTitle,
-        })),      
-      });
+      return res.status(200).send(posts);
 
     } catch (error) {
       res.status(500).send(error.message);

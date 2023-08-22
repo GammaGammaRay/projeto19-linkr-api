@@ -1,6 +1,6 @@
 import { db } from "../database/databaseConnection.js"
 import { insertPostTag, insertTagDB } from "./hashtags.repository.js";
-
+import axios from "axios";
 
 export async function postsDB(link, description, userId, hashtags) {
   try {
@@ -34,50 +34,49 @@ export const amountPosts = async () => {
 };
 
 
-export async function getPostsDB(limit, offset) {
-    const newObject = `
-      SELECT JSONB_BUILD_OBJECT(
-        'userName', users."userName",
-        'userId', users.id,
-        'profileUrl', users."profileUrl",
-        'id', posts."id",
-        'description', posts.description, 
-        'link', posts.link,
-        'author', posts."author" 
-      ) AS post
-      FROM users
-      INNER JOIN posts ON posts.author = users.id
-      ORDER BY posts."createdAt" DESC
-      LIMIT ${limit}
-      OFFSET ${offset}
-    `;
+export async function getPostsDB(limit, offset, userId) {
+
+    const result = await db.query(`
+      SELECT 
+        posts.id, 
+        description, 
+        link, 
+        author, 
+        "userName", 
+        "profileUrl", 
+        (SELECT COUNT(*) FROM curtidas WHERE curtidas."postId" = posts.id) AS "LikeCount",
+        EXISTS(SELECT author, "postId" FROM curtidas WHERE posts.id = "postId" AND author = $3) AS "liked"
+      FROM 
+          posts
+      INNER JOIN 
+          users 
+      ON 
+          posts.author = users.id
+      LIMIT $1
+      OFFSET $2`, [limit, offset, userId]
+    );
+
+    if(result.rowCount === 0) return null;
+
+    const posts = result.rows;
   
-    const result = await db.query(newObject);
-    const list = result.rows;
-  
-    const metadata = list.map(async (e) => {
+    for (let i = 0; i < posts.length; i++) {
+      const post = posts[i];
+      
       try {
-        const link = e.post.url
-        await axios
-          .get(`https://jsonlink.io/api/extract?url=${link}`)
-          .then(res => {
-  
-            const { title, description, images } = res.data
-            e.post.urlTitle = title || ''
-            e.post.urlDescr = description || ''
-            e.post.urlImg = images[0] || ''
-          })
+        const response = await axios.get(`https://jsonlink.io/api/extract?url=${post.link}`)
+        const { title, description, images } = response.data;
+        const metadata = {title, description, images};
+
+        posts[i].metadata = metadata;
+
       } catch (err) {
-        return;
+        console.log("Error while fetching metadata: ");
+        console.log(err);
       }
-      return e.post;
-    });
+    }
   
-    await Promise.all(metadata);
-  
-    return list.map((p) => {
-      return p.post;
-    });
+    return posts;
   };
 
   
