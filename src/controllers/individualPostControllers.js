@@ -1,4 +1,6 @@
-import { db } from "../database/databaseConnection.js"
+import { db } from "../database/databaseConnection.js";
+import {deletePostsDB, editPostDB, returnUserId} from "../repositories/individualPost.repository.js";
+
 
 export const handleLIke = async(req, res)=>{
     const {userId} = res.locals.userId;
@@ -28,35 +30,27 @@ export const handleLIke = async(req, res)=>{
     }
 }
 
-export const deletePost = async(req, res)=>{
-    const {postId} = req.body;
+
+export async function editPost(req, res) {
+    const { id } = req.params;
+    const { link, description } = req.body;
     try {
-        const result = await db.query(`
-        
-            DELETE FROM posts WHERE id = $1; 
-
-        `, [postId]);
-        if(result.rowCount===0)return res.status(404).send('operação não realizada');
-        return res.send(204);
+      const userId = await returnUserId(req);
+      await editPostDB(id, link, description, userId);
+      res.sendStatus(200);
     } catch (error) {
-        console.log(error.message);
-        res.status(500).send(error.message);
+      res.status(500).send(error.message);
     }
-}
+  }
+  
 
-export const editPost = async(req, res)=>{
-    const {postId, description} = req.body;
+  export async function deletePost(req, res) {
+    const { id } = req.params;
     try {
-        const result = await db.query(`
-            UPDATE posts 
-            SET description=$1
-            WHERE id = $2;
-
-        `, [ description, postId]);
-        if(result.rowCount===0)return res.status(500).send('operação não realizada');
-        return res.send(204);
+      const userId = await returnUserId(req);
+      await deletePostsDB(id, userId);
+      res.sendStatus(204);
     } catch (error) {
-        console.log(error.message);
-        res.status(500).send(error.message);
+      res.status(500).send(error.message);
     }
-}
+  }
