@@ -2,7 +2,7 @@ import { db } from "../database/databaseConnection.js";
 
 export async function getPostsByTagDB(tagName) {
   const tagQueryResult = await db.query(`SELECT id FROM tags WHERE name = $1`, [
-    tagName,
+    "#" + tagName,
   ]);
 
   if (tagQueryResult.rowCount === 0) {

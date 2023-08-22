@@ -79,6 +79,7 @@ export async function getPostsDB(limit, offset, userId) {
     return posts;
   };
 
+  
   export function recentPosts(createdAt) {
     return db.query(
       `SELECT COUNT(*) AS "countPosts" FROM posts WHERE "createdAt" >= $1
@@ -86,3 +87,19 @@ export async function getPostsDB(limit, offset, userId) {
       [createdAt]
     );
   };
+
+
+  export async function returnUserId(req) {
+    try {
+      const { authorization } = req.headers;
+      const token = authorization?.replace("Bearer ", "");
+      const databaseToken = await db.query(
+        "SELECT * FROM sessions WHERE token = $1",
+        [token]
+      );
+      const { userId } = databaseToken.rows[0];
+      return userId;
+    } catch (error) {
+      return error;
+    }
+  }

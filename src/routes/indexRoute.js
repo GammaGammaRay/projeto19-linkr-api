@@ -7,7 +7,7 @@ import postsRouter from "./posts.routes.js";
 const indexRoute = Router();
 
 indexRoute.use(AuthRouter);
-indexRoute.use(postsRouter)
+indexRoute.use(postsRouter);
 indexRoute.use(usersRoute);
 indexRoute.use(hashtagRouter);
 
