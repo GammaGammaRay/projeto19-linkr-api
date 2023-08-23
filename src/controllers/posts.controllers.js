@@ -1,4 +1,5 @@
-import {postsDB, getPostsDB, recentPosts, amountPosts} from "../repositories/posts.repository.js";
+import {postsDB, getPostsDB, recentPosts, amountPosts, postRepostDB, getRepostDB} from "../repositories/posts.repository.js";
+import { returnUserId } from "../repositories/posts.repository.js";
 import { extractHashtags } from "./hashtagsControllers.js";
 
 
@@ -45,6 +46,29 @@ export async function getPosts(req, res) {
   
       return res.status(200).send(posts);
 
+    } catch (error) {
+      res.status(500).send(error.message);
+    }
+  };
+
+
+  export async function postRepost(req, res) {
+    const { id } = req.params;
+  
+    try {
+      const userId = await returnUserId(req);
+      await postRepostDB(id, userId);
+      res.sendStatus(200);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
+  };
+  
+
+  export async function getRepost(req, res) {
+    try {
+      const repost = await getRepostDB();
+      res.status(200).send(repost.rows);
     } catch (error) {
       res.status(500).send(error.message);
     }
