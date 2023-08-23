@@ -2,13 +2,13 @@ import { ReadUserById } from "../repositories/auth.repository.js";
 import { CreateCommentary, ReadCommentaries } from "../repositories/commentaries.repository.js";
 
 
-export async function getCommentaries(res, req) {
+export async function getCommentaries(req, res) {
 
-    const { postId } = req.params;
+    const { postid } = req.params;
     
     try {
       
-        const commentaries = await ReadCommentaries(postId);
+        const commentaries = await ReadCommentaries(postid);
         return res.send(commentaries);
         
     } catch (error) {
@@ -19,7 +19,7 @@ export async function getCommentaries(res, req) {
 }
 
 
-export async function postCommentary(res, req) {
+export async function postCommentary(req, res) {
     
     const { userId } = res.locals;
     const { postId, message } = req.body;
@@ -27,14 +27,15 @@ export async function postCommentary(res, req) {
     try {
         
         const commentary = await CreateCommentary(userId, postId, message);
-        const user = await ReadUserById(commentary.id);
-        
+        const user = await ReadUserById(userId);
+        if(!user) return res.sendStatus(404);
+
         const responseObj = {...commentary, profileUrl: user.profileUrl, userName: user.userName };
       
         return res.status(201).send(responseObj);
 
     } catch (error) {
-        console.log("Error while getting commentaries", error);
+        console.log("Error while POSTING commentaries", error);
         return res.status(500).send(error);
     } 
 
