@@ -45,7 +45,8 @@ export async function getPostsDB(limit, offset, userId) {
         "userName", 
         "profileUrl", 
         (SELECT COUNT(*) FROM curtidas WHERE curtidas."postId" = posts.id) AS "LikeCount",
-        EXISTS(SELECT author, "postId" FROM curtidas WHERE posts.id = "postId" AND author = $3) AS "liked"
+        EXISTS(SELECT author, "postId" FROM curtidas WHERE posts.id = "postId" AND author = $3) AS "liked",
+        (SELECT COUNT(*) FROM commentaries WHERE posts.id = commentaries."postId") as "CommentCount"
       FROM 
           posts
       INNER JOIN 
