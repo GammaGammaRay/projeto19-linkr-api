@@ -25,6 +25,9 @@ export async function returnUserId(req) {
 
 
   export function deletePostsDB(id, userId) {
+    db.query(`DELETE FROM curtidas WHERE "postId" = $1`, [
+      id
+    ]);
     return db.query(`DELETE FROM posts WHERE id = $1 AND "userId" = $2`, [
       id,
       userId,

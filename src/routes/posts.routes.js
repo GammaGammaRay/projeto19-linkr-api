@@ -9,8 +9,8 @@ const postsRouter = Router();
 
 postsRouter.post('/posts', schemaValidation(postSchema), tokenValidation, createPosts);
 postsRouter.get('/posts', tokenValidation, getPosts);
-postsRouter.put('/posts/:id', tokenValidation, editPost);
-postsRouter.delete('/posts/:id', tokenValidation, deletePost);
+postsRouter.put('/posts/:id', editPost);
+postsRouter.delete('/posts/:id', deletePost);
 postsRouter.post('/handleLike',tokenValidation, handleLIke);
 
 export default postsRouter;
