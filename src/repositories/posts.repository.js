@@ -34,7 +34,7 @@ export const amountPosts = async () => {
 };
 
 
-export async function getPostsDB(limit, offset, userId, previousUrl, nextUrl) {
+export async function getPostsDB(limit, offset, userId) {
 
     const result = await db.query(`
       SELECT 
@@ -45,7 +45,8 @@ export async function getPostsDB(limit, offset, userId, previousUrl, nextUrl) {
         "userName", 
         "profileUrl", 
         (SELECT COUNT(*) FROM curtidas WHERE curtidas."postId" = posts.id) AS "LikeCount",
-        EXISTS(SELECT author, "postId" FROM curtidas WHERE posts.id = "postId" AND author = $3) AS "liked"
+        EXISTS(SELECT author, "postId" FROM curtidas WHERE posts.id = "postId" AND author = $3) AS "liked",
+        (SELECT COUNT(*) FROM commentaries WHERE posts.id = commentaries."postId") as "CommentCount"
       FROM 
           posts
       INNER JOIN 
@@ -53,7 +54,7 @@ export async function getPostsDB(limit, offset, userId, previousUrl, nextUrl) {
       ON 
           posts.author = users.id
       LIMIT $1
-      OFFSET $2`, [limit, offset, userId, previousUrl, nextUrl]
+      OFFSET $2`, [limit, offset, userId ]
     );
 
     if(result.rowCount === 0) return null;
