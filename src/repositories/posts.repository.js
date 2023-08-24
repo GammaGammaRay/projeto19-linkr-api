@@ -34,7 +34,7 @@ export const amountPosts = async () => {
 };
 
 
-export async function getPostsDB(limit, offset, userId) {
+export async function getPostsDB(limit, offset, userId, previousUrl, nextUrl) {
 
     const result = await db.query(`
       SELECT 
@@ -53,7 +53,7 @@ export async function getPostsDB(limit, offset, userId) {
       ON 
           posts.author = users.id
       LIMIT $1
-      OFFSET $2`, [limit, offset, userId]
+      OFFSET $2`, [limit, offset, userId, previousUrl, nextUrl]
     );
 
     if(result.rowCount === 0) return null;
@@ -118,5 +118,13 @@ export async function getPostsDB(limit, offset, userId) {
   export async function getRepostDB() {
     return db.query(
       `SELECT "postId", COUNT(*) AS reposts FROM shares GROUP BY "postId"`
+    );
+  };
+
+
+  export function countRecentPosts(recentUpdate) {
+    return db.query(
+      `SELECT COUNT(*) AS "countPosts" FROM posts WHERE "createdAt" >= $1`,
+      [recentUpdate]
     );
   };
