@@ -1,6 +1,7 @@
-import {postsDB, getPostsDB, recentPosts, amountPosts, postRepostDB, getRepostDB} from "../repositories/posts.repository.js";
+import {postsDB, getPostsDB, recentPosts, amountPosts, postRepostDB, getRepostDB, countRecentPosts} from "../repositories/posts.repository.js";
 import { returnUserId } from "../repositories/posts.repository.js";
 import { extractHashtags } from "./hashtagsControllers.js";
+import { countPosts } from "../services/posts.service.js";
 
 
 export async function createPosts(req, res) {
@@ -23,7 +24,7 @@ export async function getPosts(req, res) {
       const { userId } = res.locals; 
       let { limit, offset } = req.query;
   
-      if (!limit) limit = 5;
+      if (!limit) limit = 20;
       if (!offset) offset = 0;
   
       const { rows } = await recentPosts(); 
@@ -42,7 +43,7 @@ export async function getPosts(req, res) {
           ? `${newUrl}?limit=${limit}&offset=${previous}`
           : null;
   
-      const posts = await getPostsDB(limit, offset, userId);
+      const posts = await getPostsDB(limit, offset, userId, previousUrl, nextUrl);
   
       return res.status(200).send(posts);
 
@@ -69,6 +70,18 @@ export async function getPosts(req, res) {
     try {
       const repost = await getRepostDB();
       res.status(200).send(repost.rows);
+    } catch (error) {
+      res.status(500).send(error.message);
+    }
+  };
+
+
+  export async function newPosts(req, res) {
+    const { recentUpdate } = req.query;
+    
+    try {
+      const countPosts = await countRecentPosts(recentUpdate);
+      res.status(200).send(countPosts.rows[0]);
     } catch (error) {
       res.status(500).send(error.message);
     }
