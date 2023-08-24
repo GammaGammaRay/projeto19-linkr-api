@@ -1,6 +1,5 @@
 import { db } from "../database/databaseConnection.js"
 import { insertPostTag, insertTagDB } from "./hashtags.repository.js";
-import axios from "axios";
 
 export async function postsDB(link, description, userId, hashtags) {
   try {

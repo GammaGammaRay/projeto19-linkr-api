@@ -1,7 +1,6 @@
 import {postsDB, getPostsDB, recentPosts, amountPosts, postRepostDB, getRepostDB, countRecentPosts} from "../repositories/posts.repository.js";
 import { returnUserId } from "../repositories/posts.repository.js";
 import { extractHashtags } from "./hashtagsControllers.js";
-import { countPosts } from "../services/posts.service.js";
 
 
 export async function createPosts(req, res) {
@@ -78,7 +77,6 @@ export async function getPosts(req, res) {
 
   export async function newPosts(req, res) {
     const { recentUpdate } = req.query;
-    
     try {
       const countPosts = await countRecentPosts(recentUpdate);
       res.status(200).send(countPosts.rows[0]);

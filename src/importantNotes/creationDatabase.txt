@@ -4,14 +4,14 @@ CREATE TABLE users (
   "userName" VARCHAR(255) UNIQUE NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
   hash VARCHAR(255) NOT NULL,
-  "createdAt" TIMESTAMP NOT NULL DEFAULT NOW()
+  "createdAt" TIMESTAMP DEFAULT NOW() NOT NULL
 );
 
 CREATE TABLE sessions (
   id  SERIAL PRIMARY KEY,
   "userId" INT UNIQUE NOT NULL,
   token VARCHAR(255),
-  "createdAt" TIMESTAMP NOT NULL,
+  "createdAt" TIMESTAMP DEFAULT NOW() NOT NULL,
   FOREIGN KEY ("userId") REFERENCES users(id)
 );
 
@@ -20,7 +20,7 @@ CREATE TABLE posts (
   author INT NOT NULL,
   link VARCHAR(255) NOT NULL,
   description TEXT NOT NULL,
-  "createdAt" TIMESTAMP NOT NULL,
+  "createdAt" TIMESTAMP DEFAULT NOW() NOT NULL,
   FOREIGN KEY (author) REFERENCES users(id)
 );
 
@@ -45,10 +45,30 @@ CREATE TABLE posts_tags (
   FOREIGN KEY ("tagId") REFERENCES tags(id)
 );
 
+CREATE TABLE commentaries (
+    id SERIAL PRIMARY KEY,
+    author INTEGER NOT NULL,
+    "postId" INTEGER NOT NULL,
+    message VARCHAR NOT NULL,
+    FOREIGN KEY (author) REFERENCES users (id),
+    FOREIGN KEY ("postId") REFERENCES posts (id)
+);
+
+CREATE TABLE follows (
+    id SERIAL PRIMARY KEY,
+    "userId" INT NOT NULL,
+    "followingId" INT NOT NULL,
+    "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT fk_follower
+        FOREIGN KEY ("userId") REFERENCES users(id),
+    CONSTRAINT fk_followee
+        FOREIGN KEY ("followingId") REFERENCES users(id)
+);
+
 CREATE TABLE shares (
   "userId" INT UNIQUE NOT NULL,
   "postId" INT UNIQUE NOT NULL,
-  "createdAt" TIMESTAMP NOT NULL,
+  "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
   FOREIGN KEY ("userId") REFERENCES users(id),
   FOREIGN KEY ("postId") REFERENCES posts(id)
 );
