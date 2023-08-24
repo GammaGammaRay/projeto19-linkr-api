@@ -34,7 +34,7 @@ export const amountPosts = async () => {
 };
 
 
-export async function getPostsDB(limit, offset, userId, previousUrl, nextUrl) {
+export async function getPostsDB(limit, offset, userId) {
 
     const result = await db.query(`
       SELECT 
@@ -54,7 +54,7 @@ export async function getPostsDB(limit, offset, userId, previousUrl, nextUrl) {
       ON 
           posts.author = users.id
       LIMIT $1
-      OFFSET $2`, [limit, offset, userId, previousUrl, nextUrl]
+      OFFSET $2`, [limit, offset, userId ]
     );
 
     if(result.rowCount === 0) return null;

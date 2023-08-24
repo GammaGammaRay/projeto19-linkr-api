@@ -1,7 +1,7 @@
 import {postsDB, getPostsDB, recentPosts, amountPosts, postRepostDB, getRepostDB, countRecentPosts} from "../repositories/posts.repository.js";
 import { returnUserId } from "../repositories/posts.repository.js";
 import { extractHashtags } from "./hashtagsControllers.js";
-import { countPosts } from "../services/posts.service.js";
+// import { countPosts } from "../services/posts.service.js";
 
 
 export async function createPosts(req, res) {
@@ -38,16 +38,14 @@ export async function getPosts(req, res) {
         next < numberPosts ? `${newUrl}?limit=${limit}&offset=${next}` : null;
   
       const previous = offset - limit < 0 ? null : offset - limit;
-      const previousUrl =
-        previous != null
-          ? `${newUrl}?limit=${limit}&offset=${previous}`
-          : null;
   
-      const posts = await getPostsDB(limit, offset, userId, previousUrl, nextUrl);
-  
-      return res.status(200).send(posts);
+      const posts = await getPostsDB(limit, offset, userId);
+
+      const response = {posts, nextUrl}
+      return res.status(200).send(response);
 
     } catch (error) {
+      console.log(error);
       res.status(500).send(error.message);
     }
   };
