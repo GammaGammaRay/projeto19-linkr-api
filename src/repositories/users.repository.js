@@ -1,4 +1,5 @@
 import { db as connection } from "../database/databaseConnection.js";
+import axios from "axios";
 
 export async function searchUsersRepository(string) {
   return connection.query(`SELECT * FROM users WHERE "userName" ILIKE $1`, [
@@ -7,50 +8,68 @@ export async function searchUsersRepository(string) {
 }
 
 export async function getUserPostsRepository(id) {
-  const newObject = `
-      SELECT JSONB_BUILD_OBJECT(
-        'userName', users."userName",
-        'userId', users.id,
-        'profileUrl', users."profileUrl",
-        'id', posts."id",
-        'description', posts.description, 
-        'link', posts.link,
-        'author', posts."author" 
-      ) AS post
-      FROM users
-      INNER JOIN posts ON posts.author = users.id
-      WHERE users.id = $1
-      UNION
-      SELECT JSONB_BUILD_OBJECT(
-        'userName', users."userName",
-        'profileUrl', users."profileUrl"
-      ) AS user
-      FROM users
-      WHERE users.id = $1
-    `;
+  const result = await connection.query(
+    `
+      SELECT 
+        posts.id, 
+        description, 
+        link, 
+        author, 
+        "userName", 
+        "profileUrl", 
+        (SELECT COUNT(*) FROM curtidas WHERE curtidas."postId" = posts.id) AS "LikeCount",
+        EXISTS(SELECT author, "postId" FROM curtidas WHERE posts.id = "postId" AND author = $1) AS "liked"
+      FROM 
+          posts
+      INNER JOIN 
+          users 
+      ON 
+          posts.author = users.id
+      WHERE users.id = $1`,
+    [id]
+  );
 
-  const result = await connection.query(newObject, [id]);
-  const list = result.rows;
+  if (result.rowCount === 0) return null;
 
-  const metadata = list.map(async (e) => {
+  const posts = result.rows;
+
+  for (let i = 0; i < posts.length; i++) {
+    const post = posts[i];
+
     try {
-      const link = e.post.url;
-      await axios
-        .get(`https://jsonlink.io/api/extract?url=${link}`)
-        .then((res) => {
-          const { title, description } = res.data;
-          e.post.urlTitle = title || "";
-          e.post.urlDescr = description || "";
-        });
+      const response = await axios.get(
+        `https://jsonlink.io/api/extract?url=${post.link}`
+      );
+      const { title, description, images } = response.data;
+      const metadata = { title, description, images };
+
+      posts[i].metadata = metadata;
     } catch (err) {
-      return;
+      console.log("Error while fetching metadata: ");
+      console.log(err);
     }
-    return e.post;
-  });
+  }
 
-  await Promise.all(metadata);
+  return posts;
+}
 
-  return list.map((p) => {
-    return p.post;
-  });
+export async function followUserRepository(userId, id) {
+  return connection.query(
+    `INSERT INTO follows ("userId", "followingId") VALUES ($1, $2)`,
+    [userId, id]
+  );
+}
+
+export async function getUserFollowingRepository(userId) {
+  return connection.query(
+    `SELECT "followingId" FROM follows WHERE follows."userId" = $1`,
+    [userId]
+  );
+}
+
+export async function unFollowUserRepository(userId, id) {
+  return connection.query(
+    `DELETE FROM follows WHERE follows."userId" = $1 AND follows."followingId" = $2`,
+    [userId, id]
+  );
 }
