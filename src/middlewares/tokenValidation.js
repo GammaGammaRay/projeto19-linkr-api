@@ -8,11 +8,11 @@ export async function tokenValidation (req, res, next ){
     try {
 
         if (!token) return res.status(401).send('Token inválido!');
-
+        
         const session = await ReadSession(token);
 
         if(!session) return res.status(401).send('Token inválido!');
-
+        
         res.locals.userId = session.userId;
         next();
 

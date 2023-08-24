@@ -23,8 +23,8 @@ export async function getPosts(req, res) {
       console.log(res.locals);
       const { userId } = res.locals; 
       let { limit, offset } = req.query;
-  
-      if (!limit) limit = 20;
+      
+      if (!limit) limit = 10;
       if (!offset) offset = 0;
   
       const { rows } = await recentPosts(); 
