@@ -1,4 +1,5 @@
 import { db } from "../database/databaseConnection.js";
+import axios from "axios";
 
 export async function getPostsByTagDB(tagName) {
   const tagQueryResult = await db.query(`SELECT id FROM tags WHERE name = $1`, [
@@ -11,14 +12,35 @@ export async function getPostsByTagDB(tagName) {
 
   const tagId = tagQueryResult.rows[0].id;
 
-  const postsQueryResult = await db.query(
+  const result = await db.query(
     `SELECT * FROM posts
        JOIN posts_tags ON posts.id = posts_tags."postId"
        WHERE posts_tags."tagId" = $1`,
     [tagId]
   );
 
-  return postsQueryResult.rows;
+  if (result.rowCount === 0) return [];
+
+  const posts = result.rows;
+
+  for (let i = 0; i < posts.length; i++) {
+    const post = posts[i];
+
+    try {
+      const response = await axios.get(
+        `https://jsonlink.io/api/extract?url=${post.link}`
+      );
+      const { title, description, images } = response.data;
+      const metadata = { title, description, images };
+
+      posts[i].metadata = metadata;
+    } catch (err) {
+      console.log("Error while fetching metadata: ");
+      console.log(err);
+    }
+  }
+
+  return posts;
 }
 
 export async function getTrendingTagsDB() {
@@ -33,7 +55,6 @@ export async function getTrendingTagsDB() {
 
   return result.rows.map((row) => row.name);
 }
-
 
 export async function insertTagDB(tagName) {
   const result = await db.query(
