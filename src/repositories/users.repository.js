@@ -29,7 +29,7 @@ export async function getUserPostsRepository(id) {
     [id]
   );
 
-  if (result.rowCount === 0) return null;
+  if (result.rowCount === 0) return (await connection.query(`SELECT "userName", "profileUrl" FROM users WHERE users.id = $1`, [id])).rows;
 
   const posts = result.rows;
 
