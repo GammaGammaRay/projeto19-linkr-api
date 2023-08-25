@@ -16,7 +16,7 @@ export async function CreateCommentary(author, postId, message) {
 export async function ReadCommentaries(postId) {
 
     const result = await db.query(`
-    SELECT commentaries.id, "postId", message, "profileUrl", "userName" FROM commentaries 
+    SELECT commentaries.author, commentaries.id, "postId", message, "profileUrl", "userName" FROM commentaries 
     INNER JOIN users ON commentaries.author = users.id
     WHERE "postId" = $1 `, [
         postId
